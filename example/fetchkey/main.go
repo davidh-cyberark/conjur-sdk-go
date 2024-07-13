@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/davidh-cyberark/conjur-sdk-go/v1/conjur"
+	"github.com/davidh-cyberark/conjur-sdk-go/conjur"
 	"github.com/knadh/koanf/parsers/toml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"

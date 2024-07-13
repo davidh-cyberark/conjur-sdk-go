@@ -1,4 +1,4 @@
-module github.com/davidh-cyberark/conjur-sdk-go/v1
+module github.com/davidh-cyberark/conjur-sdk-go
 
 go 1.22.5
 

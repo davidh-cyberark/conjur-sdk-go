@@ -1,0 +1,17 @@
+# Conjur appliance url
+APIURL = "https://YOUR-CONJUR-SUB-DOMAIN.secretsmgr.cyberark.cloud/api"
+
+# Conjur account name
+Account = "conjur"
+
+# Conjur AWS region, usually us-east-1
+AWSRegion = "us-east-1"
+
+# Conjur ARN for role to assume
+IAMRoleARN = "arn:aws:iam::0123456:role/myapplication_iam_role"
+
+# Conjur identity configured for the role to authenticate against
+Identity = "host/data/myapplication/0123456/myapplication_iam_role"
+
+# Conjur authenticator id
+Authenticator = "authn-iam/myapplication"

@@ -1,0 +1,8 @@
+2024/07/12 22:33:22 Error: error refreshing assumed role creds: 
+failed to assume role: operation error STS: AssumeRole, 
+https response error StatusCode: 400, 
+RequestID: d061056c-a7c6-48e3-94f9-12eec194645b, 
+api error ValidationError: 
+2 validation errors detected: Value '' at 'roleArn' failed to satisfy constraint: 
+Member must satisfy regular expression pattern: [\u0009\u000A\u000D\u0020-\u007E\u0085\u00A0-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]+; 
+Value '' at 'roleArn' failed to satisfy constraint: Member must have length greater than or equal to 20

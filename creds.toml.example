@@ -1,17 +1,28 @@
-# Conjur appliance url
-APIURL = "https://YOUR-CONJUR-SUB-DOMAIN.secretsmgr.cyberark.cloud/api"
+# creds.toml.example
 
-# Conjur account name
-Account = "conjur"
+# Conjur Client
+[conjur]
+apiurl = "https://YOUR-CONJUR-SUB-DOMAIN.secretsmgr.cyberark.cloud/api"
+account = "conjur"
 
-# Conjur AWS region, usually us-east-1
-AWSRegion = "us-east-1"
+[pam]
+"idtenanturl" = "https://TENANTID.id.cyberark.cloud"
+"pcloudurlkey" = "data/vault/mysafe/pamcredspath/address"
+"userkey" = "data/vault/mysafe/pamcredspath/username"
+"passkey" = "data/vault/mysafe/pamcredspath/password"
 
-# Conjur ARN for role to assume
-IAMRoleARN = "arn:aws:iam::0123456:role/myapplication_iam_role"
+[aws]
+identity = "host/data/myapp/11122233344/myapplication_iam_role"
+authenticator = "authn-iam/myapplication"
 
-# Conjur identity configured for the role to authenticate against
-Identity = "host/data/myapplication/0123456/myapplication_iam_role"
+# IAM Role ARN -- role to assume
+iamrolearn = "arn:aws:iam::11122233344:role/myapplication_iam_role"
+region = "us-east-1"
 
-# Conjur authenticator id
-Authenticator = "authn-iam/myapplication"
+[azure]
+# "identity" is used for the "host-id" in the docs, SEE:
+# https://docs.cyberark.com/conjur-cloud/latest/en/Content/Developer/Conjur_API_Azure_Authenticator.htm
+identity = "host/data/apps/azurevms"
+
+# Get it from - Conjur Cloud: Authenticators -> (select one) -> Details.Service ID (remove prefix "authn-azure")
+serviceid = "myazureauthenticator"

@@ -88,10 +88,13 @@ func GetHTTPClient(timeout time.Duration, skipverify bool) *http.Client {
 
 func (c *Client) FetchSecret(key string) ([]byte, error) {
 	config := conjurapi.Config{
-		ApplianceURL: c.Config.ApiUrl,
-		Account:      c.Config.Account,
+		ApplianceURL: c.Config.ApiUrl,  // required
+		Account:      c.Config.Account, // required
 	}
 
+	if c.TokenProvider == nil {
+		return nil, fmt.Errorf("error: no token provider defined")
+	}
 	err := c.TokenProvider.RefreshToken()
 	if err != nil {
 		return nil, err

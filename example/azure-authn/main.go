@@ -1,18 +1,39 @@
 package main
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/davidh-cyberark/conjur-sdk-go/conjur"
+	"github.com/knadh/koanf/parsers/toml"
+	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/v2"
 )
 
 func main() {
-	tok, err := conjur.GetAzureAccessToken()
+	k := koanf.New(".")
+	err := k.Load(file.Provider("creds.toml"), toml.Parser())
 	if err != nil {
-		fmt.Printf("error getting access token: %s", err.Error())
-		os.Exit(1)
+		log.Fatalf("failed to load creds.toml: %s", err.Error())
 	}
 
-	fmt.Printf("%s\n", tok)
+	key := k.String("pam.pcloudurlkey")
+	if len(key) == 0 {
+		log.Fatalf("failed to load `pam.pcloudurlkey` from creds.toml")
+	}
+
+	azureprovider := conjur.NewAzureProvider(
+		conjur.WithServiceID(k.String("azure.serviceid")),
+		conjur.WithHostID(k.String("azure.identity")),
+	)
+	client := conjur.NewClient(k.String("conjur.apiurl"),
+		conjur.WithAccount(k.String("conjur.account")),
+		conjur.WithAzureProvider(&azureprovider),
+	)
+
+	val, err := client.FetchSecret(key)
+	if err != nil {
+		log.Fatalf("Error: %s", err.Error())
+	}
+
+	log.Printf("Fetched Value: %s\n", string(val))
 }

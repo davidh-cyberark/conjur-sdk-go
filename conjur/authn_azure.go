@@ -8,11 +8,12 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 )
 
 const (
-	AZURE_IMDS_ENDPOINT = "http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01"
+	DEFAULT_AZURE_IMDS_ENDPOINT = "http://169.254.169.254/metadata/identity/oauth2/token"
 )
 
 type AzureProvider struct {
@@ -24,12 +25,12 @@ type AzureProvider struct {
 
 type AzureIdentityTokenGetResponse struct {
 	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-	ExpiresIn    string `json:"expires_in"`
-	ExpiresOn    string `json:"expires_on"`
-	NotBefore    string `json:"not_before"`
-	Resource     string `json:"resource"`
-	TokenType    string `json:"token_type"`
+	RefreshToken string `json:"refresh_token,omitempty"`
+	ExpiresIn    string `json:"expires_in,omitempty"`
+	ExpiresOn    string `json:"expires_on,omitempty"`
+	NotBefore    string `json:"not_before,omitempty"`
+	Resource     string `json:"resource,omitempty"`
+	TokenType    string `json:"token_type,omitempty"`
 }
 
 func (azp *AzureProvider) RefreshToken() error {
@@ -141,18 +142,30 @@ func GetAzureAccessToken() (string, error) {
 func GetAzureIdentityToken() (AzureIdentityTokenGetResponse, error) {
 	// Create HTTP request for a managed services for Azure resources token to access Azure Resource Manager
 	var msi_endpoint *url.URL
-	msi_endpoint, err := url.Parse(AZURE_IMDS_ENDPOINT)
+	var err error
+
+	// REF: https://learn.microsoft.com/en-us/azure/app-service/overview-managed-identity?toc=%2Fazure%2Fazure-functions%2Ftoc.json&tabs=cli%2Chttp#connect-to-azure-services-in-app-code
+	if id_endpoint, ok := os.LookupEnv("IDENTITY_ENDPOINT"); ok {
+		msi_endpoint, err = url.Parse(id_endpoint)
+	} else {
+		msi_endpoint, err = url.Parse(DEFAULT_AZURE_IMDS_ENDPOINT)
+	}
 	if err != nil {
 		return AzureIdentityTokenGetResponse{}, fmt.Errorf("error creating URL: %s", err.Error())
 	}
 	msi_parameters := msi_endpoint.Query()
 	msi_parameters.Add("resource", "https://management.azure.com/")
+	msi_parameters.Add("api-version", "2019-08-01")
 	msi_endpoint.RawQuery = msi_parameters.Encode()
 	req, err := http.NewRequest("GET", msi_endpoint.String(), nil)
 	if err != nil {
 		return AzureIdentityTokenGetResponse{}, fmt.Errorf("error creating HTTP request: %s", err.Error())
 	}
 	req.Header.Add("Metadata", "true")
+	req.Header.Add("Host", msi_endpoint.Host)
+	if id_header, ok := os.LookupEnv("IDENTITY_HEADER"); ok {
+		req.Header.Add("X-IDENTITY-HEADER", id_header)
+	}
 
 	// Call managed services for Azure resources token endpoint
 	client := &http.Client{}

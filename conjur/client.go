@@ -19,11 +19,10 @@ type TokenProvider interface {
 }
 
 type Config struct {
-	ApiUrl   string // required, Ex "https://YOUR-CONJUR-CLOUD-SUBDOMAIN.secretsmgr.cyberark.cloud/api",
-	Account  string // required, Ex "conjur"
-	Identity string // required, Ex "host/data/myapplication/AWS-ACCT-NUM/AWS_IAM_ROLE",
-
-	Authenticator string // required when using an authenticator, ex "authn-iam/myapplication"
+	ApiUrl        string `json:"apiurl"`                  // required, Ex "https://YOUR-CONJUR-CLOUD-SUBDOMAIN.secretsmgr.cyberark.cloud/api",
+	Account       string `json:"account"`                 // required, Ex "conjur"
+	Identity      string `json:"identity,omitempty"`      // required when using an authenticator, ex "host/data/myapplication/service"
+	Authenticator string `json:"authenticator,omitempty"` // required when using an authenticator, ex "authn-iam/myprovider"
 }
 
 type Client struct {

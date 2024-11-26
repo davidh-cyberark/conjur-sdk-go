@@ -21,10 +21,7 @@ func main() {
 		log.Fatalf("failed to load `pam.pcloudurlkey` from creds.toml")
 	}
 
-	azureprovider := conjur.NewAzureProvider(
-		conjur.WithServiceID(k.String("azure.serviceid")),
-		conjur.WithHostID(k.String("azure.identity")),
-	)
+	azureprovider := conjur.NewAzureProvider()
 	client := conjur.NewClient(k.String("conjur.apiurl"),
 		conjur.WithAccount(k.String("conjur.account")),
 		conjur.WithAzureProvider(&azureprovider),

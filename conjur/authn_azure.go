@@ -19,8 +19,6 @@ const (
 type AzureProvider struct {
 	Client           *Client
 	RefreshRequested bool
-	ServiceID        string
-	HostID           string
 }
 
 type AzureIdentityTokenGetResponse struct {
@@ -90,28 +88,17 @@ func NewAzureProvider(options ...func(*AzureProvider) error) AzureProvider {
 	}
 	return p
 }
-func WithServiceID(svcid string) func(*AzureProvider) error {
-	return func(p *AzureProvider) error {
-		p.ServiceID = svcid
-		return nil
-	}
-}
-func WithHostID(hostid string) func(*AzureProvider) error {
-	return func(p *AzureProvider) error {
-		p.HostID = hostid
-		return nil
-	}
-}
 
 func (azp *AzureProvider) MakeAuthenticateRequest() (*http.Request, error) {
 	c := azp.Client
-	conjidentity := url.QueryEscape(azp.HostID)
+	conjidentity := url.QueryEscape(c.Config.Identity)
 
 	// https://docs.cyberark.com/conjur-cloud/latest/en/Content/Developer/Conjur_API_Azure_Authenticator.htm
-	// POST /api/authn-azure/{service-id}/conjur/{host-id}/authenticate
-	conjauthurl := fmt.Sprintf("%s/authn-azure/%s/conjur/%s/authenticate",
+	// POST /api/{authenticator}/{account}/{host-id}/authenticate
+	conjauthurl := fmt.Sprintf("%s/%s/%s/%s/authenticate",
 		c.Config.ApiUrl,
-		azp.ServiceID,
+		c.Config.Authenticator,
+		c.Config.Account,
 		conjidentity)
 
 	tok, err := GetAzureAccessToken()
